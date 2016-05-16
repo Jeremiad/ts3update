@@ -1,5 +1,4 @@
-﻿import http.client as httpClient
-from lxml import etree as etree
+﻿from lxml import etree as etree
 import platform
 import re
 import urllib.request as req
@@ -7,15 +6,16 @@ import tarfile
 import zipfile
 import os.path as path
 import shutil as util
+import cfscrape
 
 
 def Upgrade():
 
-    conn = httpClient.HTTPConnection("teamspeak.com")
-    conn.request("GET", "/downloads#server")
-    request = conn.getresponse()
-    response = etree.HTML(request.read())
-    urls  = response.xpath('//div[@class="uk-width-medium-1-2 uk-text-right"]/select[@class="mirror"]/option/@value')
+    scraper = cfscrape.create_scraper(js_engine="Node")
+    html = scraper.get("http://teamspeak.com/downloads#server").content
+    response = etree.HTML(html)
+
+    urls = response.xpath('//div[@class="uk-width-medium-2-5 uk-text-nowrap uk-text-right"]/select[@class="mirror"]/option/@value')
 
     os = platform.system()
     arch = platform.machine()
@@ -65,10 +65,9 @@ def DownloadFile(mirrorUrl):
     Extract(filename)
 
 def CurrentVersionCheck():
-    conn = httpClient.HTTPConnection("teamspeak.com")
-    conn.request("GET", "/downloads#server")
-    request = conn.getresponse()
-    response = etree.HTML(request.read())
+    scraper = cfscrape.create_scraper(js_engine="Node")
+    html = scraper.get("http://teamspeak.com/downloads#server").content
+    response = etree.HTML(html)
     versionList = response.xpath('//div[@class="download__icon-offset"][normalize-space(text())="Server 64-bit"]/span[@class="version"]/text()')
 
     return versionList[0]

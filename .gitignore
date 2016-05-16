@@ -235,5 +235,6 @@ _Pvt_Extensions
 # FAKE - F# Make
 .fake/
 
+.idea
 .ts3version
 teamspeak3-server_*
