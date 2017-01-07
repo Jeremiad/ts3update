@@ -7,6 +7,9 @@ import zipfile
 import os.path as path
 import shutil as util
 import cfscrape
+import time
+import sys
+from subprocess import call
 
 
 def Upgrade():
@@ -58,6 +61,8 @@ def Upgrade():
             DownloadFile(mirrors[0])
         else:
             print("Unknown arch")
+    version = CurrentVersionCheck()
+    WriteVersion(version)
 
 def DownloadFile(mirrorUrl):
     filename = mirrorUrl.split('/')[-1]
@@ -104,11 +109,26 @@ def Extract(filename):
 
 def Backup(folderName):
     if path.exists(folderName):
-        util.copytree(folderName, folderName + ".backup")
+        util.copytree(folderName, folderName + time.strftime("-%d-%m-%Y") + ".backup")
     else:
         print("Folder " + folderName + " not found. No need to backup?")
 
+def PreCommand():
+    print(str(sys.argv[1]))
+    if not sys.argv[1]:
+        call(sys.argv[1])
+
+def PostCommand():
+    print(str(sys.argv[2]))
+    if not sys.argv[2]:
+        call(sys.argv[2])
+
 
 if CurrentVersionCheck() != LastUpdatedVersion():
+#    PreCommand()
     Upgrade()
+#    PostCommand()
+
+else:
+    print("Already up to date")
 
